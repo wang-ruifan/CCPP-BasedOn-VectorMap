@@ -1,9 +1,19 @@
 import csv
 import matplotlib.pyplot as plt
+import os
+
+def get_data_directory():
+    current_dir = os.getcwd()
+    if current_dir.endswith('src'):
+        return '../data'
+    else:
+        return './data'
+
+data_directory = get_data_directory()
 
 # 读取 point.csv 文件
 points = {}
-with open('Overlay_path_gen/point.csv', 'r') as file:
+with open(os.path.join(data_directory, 'point.csv'), 'r') as file:
     reader = csv.DictReader(file)
     for row in reader:
         pid = int(row['PID'])
@@ -13,7 +23,7 @@ with open('Overlay_path_gen/point.csv', 'r') as file:
 
 # 读取 line.csv 文件
 lines = {}
-with open('Overlay_path_gen/line.csv', 'r') as file:
+with open(os.path.join(data_directory, 'line.csv'), 'r') as file:
     reader = csv.DictReader(file)
     for row in reader:
         lid = int(row['LID'])
@@ -25,7 +35,7 @@ with open('Overlay_path_gen/line.csv', 'r') as file:
 
 # 读取 roadedge.csv 文件
 road_edges = []
-with open('Overlay_path_gen/roadedge.csv', 'r') as file:
+with open(os.path.join(data_directory, 'roadedge.csv'), 'r') as file:
     reader = csv.DictReader(file)
     for row in reader:
         lid = int(row['LID'])
