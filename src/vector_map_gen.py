@@ -1,4 +1,17 @@
 import csv
+import os
+
+# 打印当前工作目录
+print("当前工作目录:", os.getcwd())
+
+def get_data_directory():
+    current_dir = os.getcwd()
+    if current_dir.endswith('src'):
+        return '../data'
+    else:
+        return './data'
+
+data_directory = get_data_directory()
 
 # 手动设定矩形边界的参数
 length = 200  # 矩形的长度
@@ -35,20 +48,23 @@ roadedge_rows = []
 for i in range(1, 5):
     roadedge_rows.append([i, i, 0])
 
+# 确保 data 目录存在
+os.makedirs(data_directory, exist_ok=True)
+
 # 写入 point.csv 文件
-with open('Overlay_path_gen/point.csv', 'w', newline='') as file:
-	writer = csv.writer(file)
-	writer.writerow(['PID', 'B', 'L', 'H', 'Bx', 'Ly', 'ReF', 'MCODE1', 'MCODE2', 'MCODE3'])
-	writer.writerows(point_rows)
+with open(os.path.join(data_directory, 'point.csv'), 'w', newline='') as file:
+    writer = csv.writer(file)
+    writer.writerow(['PID', 'B', 'L', 'H', 'Bx', 'Ly', 'ReF', 'MCODE1', 'MCODE2', 'MCODE3'])
+    writer.writerows(point_rows)
 
 # 写入 line.csv 文件
-with open('Overlay_path_gen/line.csv', 'w', newline='') as file:
+with open(os.path.join(data_directory, 'line.csv'), 'w', newline='') as file:
     writer = csv.writer(file)
     writer.writerow(['LID', 'BPID', 'FPID', 'BLID', 'FLID'])
     writer.writerows(line_rows)
 
 # 写入 roadedge.csv 文件
-with open('Overlay_path_gen/roadedge.csv', 'w', newline='') as file:
+with open(os.path.join(data_directory, 'roadedge.csv'), 'w', newline='') as file:
     writer = csv.writer(file)
     writer.writerow(['ID', 'LID', 'LinkID'])
     writer.writerows(roadedge_rows)
