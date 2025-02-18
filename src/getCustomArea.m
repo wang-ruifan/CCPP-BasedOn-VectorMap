@@ -1,41 +1,31 @@
-% file: get_custom_area.m
-function boundary_points = get_custom_area()
-    % 获取数据目录
-    current_dir = pwd;
-    [~, folder_name, ~] = fileparts(current_dir);
-    if strcmp(folder_name, 'src')
-        data_directory = '../data';
-    else
-        data_directory = './data';
-    end
+% file: getCustomArea.m
+function boundary_points = getCustomArea(mapData)
+    % 从 mapData 中获取相关数据
+    point_data = mapData.point;
+    line_data = mapData.line;
+    area_data = mapData.area;
+    custom_area_data = mapData.customArea;
 
-    % 读取point.csv文件
-    point_data = readtable(fullfile(data_directory, 'point.csv'));
+    % 将数据转换为 Map 对象
     points = containers.Map('KeyType', 'int32', 'ValueType', 'any');
     for i = 1:height(point_data)
         pid = point_data.PID(i);
         points(pid) = [point_data.Bx(i), point_data.Ly(i)];
     end
 
-    % 读取line.csv文件
-    line_data = readtable(fullfile(data_directory, 'line.csv'));
     lines = containers.Map('KeyType', 'int32', 'ValueType', 'any');
     for i = 1:height(line_data)
         lid = line_data.LID(i);
         lines(lid) = [line_data.BPID(i), line_data.FPID(i), ...
-                          line_data.BLID(i), line_data.FLID(i)];
+            line_data.BLID(i), line_data.FLID(i)];
     end
 
-    % 读取area.csv文件
-    area_data = readtable(fullfile(data_directory, 'area.csv'));
     areas = containers.Map('KeyType', 'int32', 'ValueType', 'any');
     for i = 1:height(area_data)
         aid = area_data.AID(i);
         areas(aid) = [area_data.SLID(i), area_data.ELID(i)];
     end
 
-    % 读取custom_area.csv文件
-    custom_area_data = readtable(fullfile(data_directory, 'custom_area.csv'));
     custom_areas = [];
     for i = 1:height(custom_area_data)
         aid = custom_area_data.AID(i);

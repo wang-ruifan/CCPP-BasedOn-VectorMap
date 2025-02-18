@@ -1,16 +1,14 @@
-% filepath: /f:/CCPP-BasedOn-VectorMap/src/spiral_path_generator.m
-function spiral_path = spiral_path_generator(d, minArea, max_seg_length, curvature, num_curve_pts, extended_gap, use_s_curve)
-    % 获取数据目录
-    current_dir = pwd;
-    [~, folder_name, ~] = fileparts(current_dir);
-    if strcmp(folder_name, 'src')
-        data_directory = '../data';
-    else
-        data_directory = './data';
-    end
+% filepath: /CCPP-BasedOn-VectorMap/src/spiralPathGen.m
+function spiral_path = spiralPathGen(params, boundary_points, use_s_curve, mapData)
+    % 从参数结构体中获取参数
+    d = params.d;
+    minArea = params.minArea;
+    max_seg_length = params.maxSegLength;
+    curvature = params.curvature;
+    num_curve_pts = params.numCurvePts;
+    extended_gap = params.extendedGap;
 
     % 读取自定义区域边界点，并构造多边形
-    boundary_points = get_custom_area();
     poly_orig = polyshape(boundary_points(:,1), boundary_points(:,2));
 
     % 第一次负偏移，避免最外层与原边界重合
@@ -30,12 +28,12 @@ function spiral_path = spiral_path_generator(d, minArea, max_seg_length, curvatu
 
     poly_current = poly_offset; % 初始区域为第一次偏移结果
     % 均匀采样外层轮廓（修改采样方式：最大采样线段长度为 max_seg_length）
-    outer_pts = sample_poly_boundary(poly_current, max_seg_length);
+    outer_pts = samplePolyBoundary(poly_current, max_seg_length);
 
-    % 读取 lane、node、point 数据，用 lane 的终点作为起始点
-    laneTable = readtable(fullfile(data_directory, 'lane.csv'));
-    nodeTable = readtable(fullfile(data_directory, 'node.csv'));
-    pointTable = readtable(fullfile(data_directory, 'point.csv'));
+    % 从 mapData 中获取 lane.csv, node.csv, point.csv 数据
+    laneTable = mapData.lane;
+    nodeTable = mapData.node;
+    pointTable = mapData.point;
 
     % 选取 lane.csv 最后一行，并获取其终点 FNID
     fnid = laneTable(end,:).FNID;
@@ -87,10 +85,10 @@ function spiral_path = spiral_path_generator(d, minArea, max_seg_length, curvatu
         end
 
         % 均匀采样内层轮廓
-        inner_pts = sample_poly_boundary(poly_offset, max_seg_length);
+        inner_pts = samplePolyBoundary(poly_offset, max_seg_length);
 
         % 对齐 inner_pts，使得 inner_pts(1,:) 距离上层末点最近
-        inner_pts = align_points(inner_pts, last_pt);
+        inner_pts = alignPoints(inner_pts, last_pt);
 
         % 计算外层末端的切线方向（取上层路径最后两个点的方向）
         if size(spiral_path,1) >= 2
@@ -133,5 +131,4 @@ function spiral_path = spiral_path_generator(d, minArea, max_seg_length, curvatu
         % 更新当前多边形
         poly_current = poly_offset;
     end
-
 end

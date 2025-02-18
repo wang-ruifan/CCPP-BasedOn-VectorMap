@@ -1,5 +1,5 @@
-% filepath: /f:/CCPP-BasedOn-VectorMap/src/align_points.m
-function pts_aligned = align_points(pts, ref_pt)
+% filepath: /CCPP-BasedOn-VectorMap/src/alignPoints.m
+function pts_aligned = alignPoints(pts, ref_pt)
     % 找到离参考点最近的顶点
     d = vecnorm(pts - ref_pt, 2, 2);
     [~, min_idx] = min(d);

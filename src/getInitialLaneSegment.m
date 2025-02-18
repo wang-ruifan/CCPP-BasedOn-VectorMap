@@ -1,25 +1,16 @@
-% filepath: /f:/CCPP-BasedOn-VectorMap/src/getInitialLaneSegment.m
-function [startPt, endPt] = getInitialLaneSegment()
-    % 获取数据目录
-    current_dir = pwd;
-    [~, folder_name, ~] = fileparts(current_dir);
-    if strcmp(folder_name, 'src')
-        data_directory = '../data';
-    else
-        data_directory = './data';
-    end
+% filepath: /CCPP-BasedOn-VectorMap/src/getInitialLaneSegment.m
+function [startPt, endPt] = getInitialLaneSegment(mapData)
+    % 从 mapData 中获取地图数据
+    pointTable = mapData.point;
+    nodeTable = mapData.node;
+    laneTable = mapData.lane;
 
-    % 读取 lane、node、point 数据
-    laneTable = readtable(fullfile(data_directory, 'lane.csv'));
-    nodeTable = readtable(fullfile(data_directory, 'node.csv'));
-    pointTable = readtable(fullfile(data_directory, 'point.csv'));
-
-    % 选取 lane.csv 第一行
-    lane = laneTable(1,:);
+    % 选取最后一行 lane 数据
+    lane = laneTable(end, :);
     % 假定 lane 表中字段 BNID 和 FNID 分别表示起点和终点的 node 编号
     bnid = lane.BNID;
     fnid = lane.FNID;
-    
+
     % 查找起点对应的 PID
     nodeRowStart = nodeTable(nodeTable.NID == bnid, :);
     if isempty(nodeRowStart)
@@ -31,7 +22,7 @@ function [startPt, endPt] = getInitialLaneSegment()
         error('未找到对应的起点 point 数据');
     end
     startPt = [pointRowStart.Bx, pointRowStart.Ly];
-    
+
     % 查找终点对应的 PID
     nodeRowEnd = nodeTable(nodeTable.NID == fnid, :);
     if isempty(nodeRowEnd)
