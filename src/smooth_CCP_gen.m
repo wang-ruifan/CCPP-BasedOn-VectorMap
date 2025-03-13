@@ -4,7 +4,7 @@ params = struct();
 
 % 螺旋路径参数
 params.spiral = struct(...
-    'd', 1, ...                 % 每层偏移距离
+    'd', 1, ...                  % 每层偏移距离
     'minArea', 5, ...           % 面积停止阈值
     'maxSegLength', 1, ...      % 每个采样线段的最大长度
     'curvature', 0.2, ...       % 曲率参数
@@ -26,22 +26,13 @@ boundary_points = getCustomArea(mapData);
 [laneStartPt, laneEndPt] = getInitialLaneSegment(mapData);
 lanePt = [laneStartPt; laneEndPt];
 
-%% 区域边界与初始车道可视化
-visualizeArea(boundary_points, lanePt, '区域边界与初始车道');
-
-%% 生成螺旋路径
-% 不使用S曲线连接
-spiral_path = spiralPathGen(params.spiral, boundary_points, false, mapData);
-plotSpiralPath(spiral_path, boundary_points, lanePt, '传统螺旋路径');
-
 %% 生成用S曲线平滑连接的螺旋路径
 % 使用S曲线连接
 spiral_path = spiralPathGen(params.spiral, boundary_points, true, mapData);
-plotSpiralPath(spiral_path, boundary_points, lanePt, '每层间使用S曲线平滑连接的螺旋路径');
 
 %% 平滑路径中的转角
 smooth_path = smoothCorners(spiral_path, params.smooth);
-plotSpiralPath(smooth_path, boundary_points, lanePt, '再对转角进行平滑处理后的螺旋路径');
+plotSpiralPath(smooth_path, boundary_points, lanePt, '平滑的覆盖式螺旋路径');
 
 %% 将路径保存到VectorMap中
 saveSmoothPathToVectorMap(smooth_path, mapData);
