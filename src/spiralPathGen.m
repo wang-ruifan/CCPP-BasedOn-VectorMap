@@ -1,5 +1,5 @@
 % filepath: /CCPP-BasedOn-VectorMap/src/spiralPathGen.m
-function spiral_path = spiralPathGen(params, boundary_points, use_s_curve, mapData)
+function spiral_path = spiralPathGen(params, boundary_points, use_s_curve, laneStartPt)
     % 从参数结构体中获取参数
     d = params.d;
     minArea = params.minArea;
@@ -29,26 +29,6 @@ function spiral_path = spiralPathGen(params, boundary_points, use_s_curve, mapDa
     poly_current = poly_offset; % 初始区域为第一次偏移结果
     % 均匀采样外层轮廓（修改采样方式：最大采样线段长度为 max_seg_length）
     outer_pts = samplePolyBoundary(poly_current, max_seg_length);
-
-    % 从 mapData 中获取 lane.csv, node.csv, point.csv 数据
-    laneTable = mapData.lane;
-    nodeTable = mapData.node;
-    pointTable = mapData.point;
-
-    % 选取 lane.csv 最后一行，并获取其终点 FNID
-    fnid = laneTable(end,:).FNID;
-    % 在 node.csv 中查找对应的 PID
-    nodeRow = nodeTable(nodeTable.NID == fnid, :);
-    if isempty(nodeRow)
-        error('未找到对应的 node 数据，请检查 lane.csv 与 node.csv 的匹配关系。');
-    end
-    startPID = nodeRow.PID;
-    % 在 point.csv 中获取对应的坐标（Bx, Ly）
-    pointRow = pointTable(pointTable.PID == startPID, :);
-    if isempty(pointRow)
-        error('未找到对应的 point 数据，请检查 node.csv 与 point.csv 的匹配关系。');
-    end
-    laneStartPt = [pointRow.Bx, pointRow.Ly];
 
     % 连接车道终点与外层轮廓起点
     if size(outer_pts,1) >= 2
@@ -90,24 +70,24 @@ function spiral_path = spiralPathGen(params, boundary_points, use_s_curve, mapDa
         % 对齐 inner_pts，使得 inner_pts(1,:) 距离上层末点最近
         inner_pts = alignPoints(inner_pts, last_pt);
 
-        % 计算外层末端的切线方向（取上层路径最后两个点的方向）
-        if size(spiral_path,1) >= 2
-            v_outer = last_pt - spiral_path(end-1,:);
-            v_outer = v_outer / norm(v_outer);
-        else
-            v_outer = [1, 0]; % 默认方向
-        end
-
-        % 计算内层起点的切线方向（取 inner_pts 前两个点的方向）
-        if size(inner_pts,1) >= 2
-            v_inner = inner_pts(2,:) - inner_pts(1,:);
-            v_inner = v_inner / norm(v_inner);
-        else
-            v_inner = [1, 0]; % 默认方向
-        end
-
         % 根据 use_s_curve 参数决定使用 S 型曲线还是直线连接
         if use_s_curve
+            % 计算外层末端的切线方向（取上层路径最后两个点的方向）
+            if size(spiral_path,1) >= 2
+                v_outer = last_pt - spiral_path(end-1,:);
+                v_outer = v_outer / norm(v_outer);
+            else
+                v_outer = [1, 0]; % 默认方向
+            end
+    
+            % 计算内层起点的切线方向（取 inner_pts 前两个点的方向）
+            if size(inner_pts,1) >= 2
+                v_inner = inner_pts(2,:) - inner_pts(1,:);
+                v_inner = v_inner / norm(v_inner);
+            else
+                v_inner = [1, 0]; % 默认方向
+            end
+
             % 得到延长后的断点
             new_outer_pt = last_pt - extended_gap * v_outer;
             new_inner_pt = inner_pts(1,:) + extended_gap * v_inner;

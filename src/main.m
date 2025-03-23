@@ -1,3 +1,4 @@
+clear
 %% 参数设置
 % 设置参数结构体
 params = struct();
@@ -31,12 +32,12 @@ visualizeArea(boundary_points, lanePt, '区域边界与初始车道');
 
 %% 生成螺旋路径
 % 不使用S曲线连接
-spiral_path = spiralPathGen(params.spiral, boundary_points, false, mapData);
-plotSpiralPath(spiral_path, boundary_points, lanePt, '传统螺旋路径');
+spiral_path = spiralPathGen(params.spiral, boundary_points, false, laneEndPt);
+plotSpiralPath(spiral_path, boundary_points, lanePt, '常规螺旋路径');
 
 %% 生成用S曲线平滑连接的螺旋路径
 % 使用S曲线连接
-spiral_path = spiralPathGen(params.spiral, boundary_points, true, mapData);
+spiral_path = spiralPathGen(params.spiral, boundary_points, true, laneEndPt);
 plotSpiralPath(spiral_path, boundary_points, lanePt, '每层间使用S曲线平滑连接的螺旋路径');
 
 %% 平滑路径中的转角
