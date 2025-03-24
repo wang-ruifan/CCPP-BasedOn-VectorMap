@@ -20,6 +20,10 @@
 4. 在 Unity 中，使用`Load Autoware ADASMap from folder`加载生成的高精地图数据。
 5. 在ROS Autoware中读取地图数据进行路径规划与导航。
 
+### 使用MATLAB Online
+如果不需要修改初始的高精地图边界数据，可以直接使用MATLAB Online，使用Demo数据进程测试。
+[![Open in MATLAB Online](https://www.mathworks.com/images/responsive/global/open-in-matlab-online.svg)](https://matlab.mathworks.com/open/github/v1?repo=wang-ruifan/CCPP-BasedOn-VectorMap)
+
 ## 文件目录说明
 
 - **.gitignore**：Git 忽略规则。
